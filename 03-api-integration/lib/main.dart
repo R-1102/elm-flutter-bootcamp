@@ -23,8 +23,6 @@ class UserListScreen extends StatefulWidget {
 
 class _UserListScreenState extends State<UserListScreen> {
   late Future<List<User>> _futureUsers;
-  bool _isLoading = true;
-  String _error = '';
 
   final List<IconData> _userIcons = [Icons.person];
 
@@ -32,18 +30,7 @@ class _UserListScreenState extends State<UserListScreen> {
   void initState() {
     super.initState();
     _futureUsers = ApiService().fetchUsers();
-    _futureUsers
-        .then((value) {
-          setState(() {
-            _isLoading = false;
-          });
-        })
-        .catchError((e) {
-          setState(() {
-            _isLoading = false;
-            _error = e.toString();
-          });
-        });
+
   }
 
   IconData _getRandomIcon(int index) {
@@ -54,12 +41,7 @@ class _UserListScreenState extends State<UserListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('User List')),
-      body:
-          _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : _error.isNotEmpty
-              ? Center(child: Text('Error: $_error'))
-              : FutureBuilder<List<User>>(
+      body: FutureBuilder<List<User>>(
                 future: _futureUsers,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

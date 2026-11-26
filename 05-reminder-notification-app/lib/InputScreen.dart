@@ -18,23 +18,44 @@ class _InputScreenState extends State<InputScreen> {
       initialTime: TimeOfDay.now(),
     );
 
-    if (time != null) {
+    if (time != null && mounted) {
       setState(() => _selectedTime = time);
     }
   }
 
-  void _scheduleNotification() async {
-    final title = _titleController.text;
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _scheduleNotification() async {
+    final title = _titleController.text.trim();
     if (title.isEmpty || _selectedTime == null) return;
 
     final now = DateTime.now();
-    final scheduledDate = DateTime(
+    var scheduledDate = DateTime(
       now.year,
       now.month,
       now.day,
       _selectedTime!.hour,
       _selectedTime!.minute,
     );
+
+    if (!scheduledDate.isAfter(now)) {
+      scheduledDate = DateTime(now.year, now.month, now.day + 1,
+          _selectedTime!.hour, _selectedTime!.minute);
+    }
+    final allowed = await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+    if (!mounted) return;
+    if (allowed == false) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Notification permission denied')),
+      );
+      return;
+    }
 
     const androidDetails = AndroidNotificationDetails(
       'reminder_channel',
@@ -45,20 +66,29 @@ class _InputScreenState extends State<InputScreen> {
 
     const notificationDetails = NotificationDetails(android: androidDetails);
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
+    try {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
       0,
       'Reminder',
       title,
-      tz.TZDateTime.from(scheduledDate, tz.local),
+      tz.TZDateTime.from(scheduledDate.toUtc(), tz.UTC),
       notificationDetails,
-      androidAllowWhileIdle: true,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
       UILocalNotificationDateInterpretation.absoluteTime,
       payload: title,
     );
 
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to schedule reminder')),
+      );
+      return;
+    }
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Reminder scheduled")),
+      const SnackBar(content: Text("Reminder scheduled")),
     );
   }
 

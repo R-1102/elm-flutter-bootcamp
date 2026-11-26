@@ -1,32 +1,34 @@
-# Notes App (Flutter + SQLite)
-A simple and Flutter app to manage your notes locally using SQLite . Users can add, view, and delete notes.
+# Local Database App
+
+A local notes application for creating, viewing and deleting notes.
+
+Developed as part of Elm's Flutter Development Bootcamp.
+
+- **Project Date:** May 12, 2025
+- **Technologies:** Dart, Flutter, SQLite, sqflite
+
 ## Features
-- Add new notes with a title and content
 
-- View list of saved notes
+- Add notes with a title and content.
+- Persist and retrieve notes using SQLite.
+- Delete saved notes and display them in a Material 3 interface.
 
-- Delete notes
+## Getting Started
 
-- Local storage using SQLite (sqflite)
+Open this folder using Android Studio or VS Code with the Flutter extension. Use a Flutter SDK compatible with the original Dart SDK constraint (`^3.7.2`).
 
-
-## Dependencies
-Add these to your pubspec.yaml:
-
+```bash
+flutter pub get
+flutter run
 ```
-dependencies:
 
-  flutter:
-    sdk: flutter
-  sqflite: ^2.3.2
-  path: ^1.9.0
-  provider: ^6.1.1
+Run on Android or iOS with SQLite support.
 
-```
+Run the included basic tests with `flutter test`.
 
 ## Screenshots
-<p align="center">
-   <img src="https://github.com/user-attachments/assets/352fbe80-7aea-480d-8cdd-fcab01029bac" height="500" Width="220"/>
-  <img src="https://github.com/user-attachments/assets/03393dbf-8e64-4d03-b779-6744ff4ab6ee" height="500"  Width="220"/>
-</p>
 
+<p align="center">
+  <img src="screenshots/screenshot-01.png" alt="Screenshot 1" width="240" />
+  <img src="screenshots/screenshot-02.png" alt="Screenshot 2" width="240" />
+</p>

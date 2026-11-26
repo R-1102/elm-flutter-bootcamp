@@ -43,6 +43,7 @@ class _NotesHomeState extends State<NotesHome> {
 
   Future<void> _loadNotes() async {
     final notes = await DBHelper.getNotes();
+    if (!mounted) return;
     setState(() => _notes = notes);
   }
 
@@ -97,6 +98,7 @@ class _NotesHomeState extends State<NotesHome> {
                   onPressed: () async {
                     if (titleController.text.isNotEmpty && contentController.text.isNotEmpty) {
                       await DBHelper.insertNote(titleController.text, contentController.text);
+                      if (!context.mounted || !mounted) return;
                       Navigator.pop(context);
                       _loadNotes();
                     }
@@ -108,6 +110,13 @@ class _NotesHomeState extends State<NotesHome> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    super.dispose();
   }
 
   Future<void> _deleteNote(int id) async {
